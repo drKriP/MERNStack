@@ -1,4 +1,6 @@
 const { check,validationResult } = require('express-validator');
+const User = require('../models/user');
+
 const userRegisterValidator = [
     check('username', 'Username is required').notEmpty(),
     check('email', 'Email is required').notEmpty(),
@@ -20,5 +22,14 @@ const userRegisterValidator = [
         next();
     }
 ]
+const userById = async (req, res, next) => {
+        const user = await User.findById(req._id).exec();
+        if(!user){
+            return res.status(404).json({error: 'User not found'});
+        }
+        req.user = user;
+        next();
+}
 
 module.exports.userRegisterValidator = userRegisterValidator;
+module.exports.userById = userById;

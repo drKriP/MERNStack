@@ -43,8 +43,10 @@ const login = async (req, res) => {
                 error: 'Email and password do not match'
             });
         }
+        let now = new Date();
+        console.log(now);
         const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET, {expiresIn: '24h'});
-        res.cookie('jwt', token, {expires: new Date(Date.now() + 9999), httpOnly: true});
+        res.cookie('jwt', token, {expires: new Date(Date.now() + 24 * 60 * 60 * 1000), httpOnly: true});
         const {username} = user;
         return res.json({
             message: 'Login successful',
@@ -62,6 +64,17 @@ const logout = (req, res) => {
     return res.json({message: 'Logout successful'});
 }
 
+const getLodgedInUser = (req, res) => {
+    const {username} = req.user;
+
+    return res.status(200).json({
+        message: 'User is still logged in',
+        user: req.user
+    });
+}
+
+
 module.exports.register = register;
 module.exports.login = login;
 module.exports.logout = logout;
+module.exports.getLodgedInUser = getLodgedInUser;

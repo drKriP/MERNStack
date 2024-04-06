@@ -1,6 +1,28 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { Link } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
+import {toast} from 'react-toastify';
+import UserContext from '../UserContext';
+import {logout} from '../api/user';
 const Header = () => {
+    const navigate = useNavigate();
+    const {user, setUser} = useContext(UserContext);
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await logout();
+            console.log(res);
+            if(res.error) {
+                toast.error(res.error);
+            } else {
+                toast.success(res.message);
+                setUser(null);
+                navigate('/');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     return (
         <nav className="navbar navbar-expand-lg bg-primary navbar-dark">
             <div className="container-fluid">
@@ -14,12 +36,25 @@ const Header = () => {
                         <button className="btn btn-outline-success" type="submit">Search</button>
                     </form>
                     <ul className="navbar-nav ms-auto">
-                        <li className="nav-item">
-                            <Link className="nav-link active" to="/login">Login</Link>
-                        </li>
-                        <li className="nav-item">
+                        {!user ? 
+                        (<>
+                            <li className="nav-item">
                             <Link className="nav-link active" to="/signup">Signup</Link>
-                        </li>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link active" to="/login">Login</Link>
+                            </li>
+                        </>) : 
+                        (<>
+                            <li className="nav-item">
+                                <span 
+                                    className="nav-link active" 
+                                    style={{cursor: "pointer"}}
+                                    onClick={handleLogout}
+                                >Logout</span>
+                            </li>
+                        </>)
+                        }
                         {/* <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Dropdown
